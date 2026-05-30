@@ -26,4 +26,17 @@ CHIP Memory {
 
     PARTS:
 	//// Replace this comment with your code.
+    DMux(in = load, sel = address[14], a = loadM, b = loadIO);
+    // RAM;
+    RAM16K(in = in, load = loadM,address = address[0..13],out = outM);
+    // Screen
+    DMux(in = loadIO, sel = address[13], a= loadS, b = loadK);
+    Screen(in = in, load = loadS,address = address[0..12], out = outS);
+    
+    //Keyboard
+    Keyboard(out = outK);
+    // select 先选IO后选M/IO -----------------
+    Mux16(a = outM, b = outIO, sel = address[14], out = out);
+    // outIO上面要用到
+    Mux16(a = outS, b = outK, sel = address[13], out = outIO);
 }

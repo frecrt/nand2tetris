@@ -33,4 +33,43 @@ CHIP CPU {
 
     PARTS:
 	//// Replace this comment with your code.
+    // ALU
+    ALU(x = Doutput,y = AMMux, zx = instruction[11], nx = instruction[10], zy = instruction[9],
+            ny = instruction[8],f = instruction[7], no = instruction[6],
+            out = ALUoutput, out = outM,zr = zr, ng = ng);
+    
+    // writeM
+    And(a = instruction[15], b = instruction[3], out = writeM);
+
+    // preA
+    Mux16(a = instruction, b = ALUoutput, sel = instruction[15],out = preA);
+
+    //And(a = instruction[15], b = instruction[5], out = writeA); //error A指令时不会更新A writeA = 0
+    Not(in = instruction[15], out = Ainstruction);
+    Or(a = Ainstruction, b = instruction[5], out = writeA);
+
+    // addressM - 必须使用专用ARegister
+    ARegister(in = preA, load = writeA, out = Aoutput, out[0..14] = addressM);
+    // D Register - 同样要用DRegister
+    And(a = instruction[15], b = instruction[4], out = writeD);
+    DRegister(in = ALUoutput, load = writeD, out = Doutput);
+
+    // A or M
+    Mux16(a = Aoutput, b = inM, sel = instruction[12], out = AMMux);
+
+    // pc
+    // jmp Logic
+    Not(in = zr, out = nzr);
+    Not(in = ng, out = nng);
+    // 正数
+    And(a = nzr, b =nng, out = ps); 
+    // instruction[2] = JLT, instruction[1] = JEQ, instruction[0] = JGT
+    And(a = ng, b = instruction[2], out = jlt);
+    And(a = zr, b = instruction[1], out = jeq);
+    And(a = ps, b = instruction[0], out = jgt);
+
+    Or(a = jlt, b = jeq, out = jle);
+    Or(a = jle, b = jgt, out = jump);
+    And(a = instruction[15], b = jump, out = doJump);
+    PC(in = Aoutput, load = doJump, inc = true, reset = reset, out[0..14] = pc);
 }

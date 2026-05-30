@@ -19,4 +19,21 @@ CHIP Computer {
 
     PARTS:
     //// Replace this comment with your code.
+    // ROM：存储程序指令，地址来自 CPU 的 pc 输出
+    ROM32K(address = pc, out = instruction);
+
+    // CPU：执行指令，连接 ROM 和 RAM
+    CPU(inM        = inM,
+        instruction = instruction,
+        reset       = reset,
+        outM        = outM,
+        writeM      = writeM,
+        addressM    = addressM,
+        pc          = pc);
+
+    // RAM（Memory）：包含主内存、屏幕、键盘
+    Memory(in      = outM,
+           load    = writeM,
+           address = addressM,
+           out     = inM);
 }
