@@ -15,4 +15,12 @@ CHIP PC {
     
     PARTS:
     //// Replace this comment with your code.
+    Inc16(in = current, out = incOut);
+    Mux16(a = current, b = incOut, sel = inc, out = afterInc);
+    // 优先级从低到高
+    Mux16(a = afterInc, b = in, sel = load, out = afterLoad);
+    Mux16(a = afterLoad, b[0..15] = false, sel = reset, out = afterReset);
+
+    Register(in = afterReset, load = true, out = out, out = current);
+
 }
