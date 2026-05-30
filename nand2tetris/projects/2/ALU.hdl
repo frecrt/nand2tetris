@@ -42,4 +42,33 @@ CHIP ALU {
 
     PARTS:
     //// Replace this comment with your code.
+    // 宽度不匹配：
+    //Not(in = zx, out = zxNot);
+    //And16(a = x, b[0..15] = zxNot,out = xFirst);
+    //Not(in = zy, out = zyNot);
+    //And16(a =y, b[0..15] = zyNot,out = yFirst);
+
+    // zx=1 时输出全0，zx=0 时输出x本身
+Mux16(a = x, b[0..15] = false, sel = zx, out = xFirst);
+
+// zy=1 时输出全0，zy=0 时输出y本身
+Mux16(a = y, b[0..15] = false, sel = zy, out = yFirst);
+
+    Not16(in = xFirst, out = xFirstNot);
+    Not16(in = yFirst, out = yFirstNot);
+    Mux16(a = xFirst, b = xFirstNot,sel = nx, out = xCal);
+    Mux16(a = yFirst, b = yFirstNot,sel = ny, out = yCal);
+
+    Add16(a = xCal, b = yCal, out = xAddy);
+    And16(a = xCal, b = yCal, out = xAndy);
+
+    Mux16(a = xAndy, b = xAddy, sel = f, out = outFirst);
+    Not16(in = outFirst, out = outSecond);
+    Mux16(a = outFirst, b = outSecond, sel = no, out = out, out[15] = ng,out[0..7] = zrLow,out[8..15] = zrHigh);
+    // flag bit
+    Or8Way(in = zrLow, out = zr0r1);
+    Or8Way(in = zrHigh, out = zr0r2);
+    Or(a = zr0r1,b = zr0r2, out = zrNot);
+    Not(in = zrNot, out = zr);
+    
 }
