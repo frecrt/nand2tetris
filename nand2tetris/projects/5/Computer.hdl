@@ -20,6 +20,7 @@ CHIP Computer {
     PARTS:
     //// Replace this comment with your code.
     // ROM：存储程序指令，地址来自 CPU 的 pc 输出
+    // 哈佛架构， 指令M与数据M分开
     ROM32K(address = pc, out = instruction);
 
     // CPU：执行指令，连接 ROM 和 RAM

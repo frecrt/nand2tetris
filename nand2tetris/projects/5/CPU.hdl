@@ -67,7 +67,7 @@ CHIP CPU {
     And(a = ng, b = instruction[2], out = jlt);
     And(a = zr, b = instruction[1], out = jeq);
     And(a = ps, b = instruction[0], out = jgt);
-
+    
     Or(a = jlt, b = jeq, out = jle);
     Or(a = jle, b = jgt, out = jump);
     And(a = instruction[15], b = jump, out = doJump);
